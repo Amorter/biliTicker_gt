@@ -1,11 +1,12 @@
 mod abstraction;
+mod error;
 mod implement;
 
 #[cfg(test)]
 mod tests {
-    use std::panic::AssertUnwindSafe;
     use crate::abstraction::Test;
     use crate::implement::{Click, Slide};
+    use std::panic::AssertUnwindSafe;
 
     #[test]
     fn slide_test() {
@@ -23,9 +24,10 @@ mod tests {
     fn click_test_batch() {
         let mut click = Click::default();
         let mut suc = 0;
-        for i in 1..=100 {
+        for _ in 1..=100 {
             let r = std::panic::catch_unwind(AssertUnwindSafe(|| {
-                click.test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web");
+                click
+                    .test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web");
             }));
 
             if r.is_ok() {
