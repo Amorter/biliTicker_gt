@@ -1,4 +1,6 @@
-use crate::error::{missing_param, net_work_error, other, Result, other_without_source, parse_error};
+use crate::error::{
+    missing_param, net_work_error, other, other_without_source, parse_error, Result,
+};
 use reqwest::blocking::Client;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -59,8 +61,17 @@ pub(crate) trait Api {
             .ok_or_else(|| other_without_source("后缀错误"))?;
         let res: Value = serde_json::from_str(res).map_err(parse_error)?;
         let data = res.get("data").ok_or_else(|| missing_param("data"))?;
-        let c: Vec<u8> = serde_json::from_value(data.get("c").ok_or_else(|| missing_param("c"))?.clone()).map_err(parse_error)?;
-        Ok((c, data.get("s").ok_or_else(|| missing_param("s"))?.as_str().ok_or_else(|| missing_param("s"))?.to_string()))
+        let c: Vec<u8> =
+            serde_json::from_value(data.get("c").ok_or_else(|| missing_param("c"))?.clone())
+                .map_err(parse_error)?;
+        Ok((
+            c,
+            data.get("s")
+                .ok_or_else(|| missing_param("s"))?
+                .as_str()
+                .ok_or_else(|| missing_param("s"))?
+                .to_string(),
+        ))
     }
     /// ### 获取验证码类型
     /// #### 返回值
@@ -75,7 +86,12 @@ pub(crate) trait Api {
         if let Some(w) = w {
             params.insert("w", w);
         }
-        let res = self.client().get(url).query(&params).send().map_err(net_work_error)?;
+        let res = self
+            .client()
+            .get(url)
+            .query(&params)
+            .send()
+            .map_err(net_work_error)?;
         let res = res.text().map_err(|e| other("什么b玩意错误", e))?;
         let res = res
             .strip_prefix("geetest_1717934072177(")
@@ -84,7 +100,11 @@ pub(crate) trait Api {
             .ok_or_else(|| other_without_source("后缀错误"))?;
         let res: Value = serde_json::from_str(res).map_err(parse_error)?;
         let data = res.get("data").ok_or_else(|| missing_param("data"))?;
-        let result = data.get("result").ok_or_else(|| missing_param("result"))?.as_str().ok_or_else(|| missing_param("result"))?;
+        let result = data
+            .get("result")
+            .ok_or_else(|| missing_param("result"))?
+            .as_str()
+            .ok_or_else(|| missing_param("result"))?;
         match result {
             "slide" => Ok(VerifyType::Slide),
             "click" => Ok(VerifyType::Click),
@@ -97,7 +117,11 @@ pub(crate) trait Api {
     /// - s
     /// - challenge
     /// - args(不定数目)
-    fn get_new_c_s_args(&self, gt: &str, challenge: &str) -> Result<(Vec<u8>, String, Self::ArgsType)>;
+    fn get_new_c_s_args(
+        &self,
+        gt: &str,
+        challenge: &str,
+    ) -> Result<(Vec<u8>, String, Self::ArgsType)>;
     /// ### 验证
     /// #### 返回值
     /// - message
@@ -112,7 +136,12 @@ pub(crate) trait Api {
         if let Some(w) = w {
             params.insert("w", w);
         }
-        let res = self.client().get(url).query(&params).send().map_err(net_work_error)?;
+        let res = self
+            .client()
+            .get(url)
+            .query(&params)
+            .send()
+            .map_err(net_work_error)?;
         let res = res.text().unwrap();
         let res = res
             .strip_prefix("geetest_1717918222610(")
@@ -168,18 +197,24 @@ pub(crate) trait Test: Api + GenerateW {
         let (gt, challenge) = self.register_test(url).unwrap();
         let (_, _) = self.get_c_s(gt.as_str(), challenge.as_str(), None).unwrap();
         let _ = self.get_type(gt.as_str(), challenge.as_str(), None);
-        let (c, s, args) = self.get_new_c_s_args(gt.as_str(), challenge.as_str()).unwrap();
+        let (c, s, args) = self
+            .get_new_c_s_args(gt.as_str(), challenge.as_str())
+            .unwrap();
         let key = self.calculate_key(args).unwrap();
-        let w = self.generate_w(
-            key.as_str(),
-            gt.as_str(),
-            challenge.as_str(),
-            serde_json::to_string(&c).unwrap().as_str(),
-            s.as_str(),
-            rt,
-        ).unwrap();
+        let w = self
+            .generate_w(
+                key.as_str(),
+                gt.as_str(),
+                challenge.as_str(),
+                serde_json::to_string(&c).unwrap().as_str(),
+                s.as_str(),
+                rt,
+            )
+            .unwrap();
         sleep(Duration::new(2, 0));
-        let res = self.verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str())).unwrap();
+        let res = self
+            .verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str()))
+            .unwrap();
         println!("{:?}", res);
     }
 }

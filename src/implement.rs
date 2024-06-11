@@ -1,5 +1,7 @@
 use crate::abstraction::{Api, GenerateW, Test, VerifyType};
-use crate::error::{missing_param, net_work_error, other, other_without_source, parse_error, Result};
+use crate::error::{
+    missing_param, net_work_error, other, other_without_source, parse_error, Result,
+};
 use ddddocr::{BBox, CharsetRange, Ddddocr};
 use image::{GenericImage, ImageFormat};
 use reqwest::blocking::Client;
@@ -24,7 +26,11 @@ impl Default for Slide {
 impl Api for Slide {
     /// (new_challenge, 完整背景图url, 缺口背景图url, 滑块图url)
     type ArgsType = (String, String, String, String);
-    fn get_new_c_s_args(&self, gt: &str, challenge: &str) -> Result<(Vec<u8>, String, Self::ArgsType)> {
+    fn get_new_c_s_args(
+        &self,
+        gt: &str,
+        challenge: &str,
+    ) -> Result<(Vec<u8>, String, Self::ArgsType)> {
         let url = "http://api.geevisit.com/get.php";
         let mut params = HashMap::from([
             ("gt", gt),
@@ -41,7 +47,12 @@ impl Api for Slide {
                 VerifyType::Slide => "slide",
             },
         );
-        let res = self.client.get(url).query(&params).send().map_err(net_work_error)?;
+        let res = self
+            .client
+            .get(url)
+            .query(&params)
+            .send()
+            .map_err(net_work_error)?;
         let res = res.text().map_err(|e| other("什么b玩意错误", e))?;
         let res = res
             .strip_prefix("geetest_1717915671544(")
@@ -49,7 +60,9 @@ impl Api for Slide {
             .strip_suffix(")")
             .ok_or_else(|| other_without_source("后缀错误"))?;
         let res: Value = serde_json::from_str(res).map_err(parse_error)?;
-        let c: Vec<u8> = serde_json::from_value(res.get("c").ok_or_else(|| missing_param("c"))?.clone()).map_err(parse_error)?;
+        let c: Vec<u8> =
+            serde_json::from_value(res.get("c").ok_or_else(|| missing_param("c"))?.clone())
+                .map_err(parse_error)?;
         let static_server = res
             .get("static_servers")
             .ok_or_else(|| missing_param("static_servers"))?
@@ -71,17 +84,26 @@ impl Api for Slide {
                 format!(
                     "https://{}{}",
                     static_server,
-                    res.get("fullbg").ok_or_else(|| missing_param("fullbg"))?.as_str().ok_or_else(|| missing_param("fullbg"))?
+                    res.get("fullbg")
+                        .ok_or_else(|| missing_param("fullbg"))?
+                        .as_str()
+                        .ok_or_else(|| missing_param("fullbg"))?
                 ),
                 format!(
                     "https://{}{}",
                     static_server,
-                    res.get("bg").ok_or_else(|| missing_param("bg"))?.as_str().ok_or_else(|| missing_param("bg"))?
+                    res.get("bg")
+                        .ok_or_else(|| missing_param("bg"))?
+                        .as_str()
+                        .ok_or_else(|| missing_param("bg"))?
                 ),
                 format!(
                     "https://{}{}",
                     static_server,
-                    res.get("slice").ok_or_else(|| missing_param("slice"))?.as_str().ok_or_else(|| missing_param("slice"))?
+                    res.get("slice")
+                        .ok_or_else(|| missing_param("slice"))?
+                        .as_str()
+                        .ok_or_else(|| missing_param("slice"))?
                 ),
             ),
         ))
@@ -136,7 +158,10 @@ impl GenerateW for Slide {
         rt: &str,
     ) -> Result<String> {
         let params = vec![key, gt, challenge, c, s, rt];
-        let out_put = Command::new(".\\slide.exe").args(&params).output().map_err(|e| other("slide.exe命令行错误", e))?;
+        let out_put = Command::new(".\\slide.exe")
+            .args(&params)
+            .output()
+            .map_err(|e| other("slide.exe命令行错误", e))?;
         Ok(String::from_utf8_lossy(&out_put.stdout).to_string())
     }
 }
@@ -147,18 +172,24 @@ impl Test for Slide {
         let (gt, mut challenge) = self.register_test(url).unwrap();
         let (_, _) = self.get_c_s(gt.as_str(), challenge.as_str(), None).unwrap();
         let _ = self.get_type(gt.as_str(), challenge.as_str(), None);
-        let (c, s, args) = self.get_new_c_s_args(gt.as_str(), challenge.as_str()).unwrap();
+        let (c, s, args) = self
+            .get_new_c_s_args(gt.as_str(), challenge.as_str())
+            .unwrap();
         challenge = args.0.clone();
         let key = self.calculate_key(args).unwrap();
-        let w = self.generate_w(
-            key.as_str(),
-            gt.as_str(),
-            challenge.as_str(),
-            serde_json::to_string(&c).unwrap().as_str(),
-            s.as_str(),
-            rt,
-        ).unwrap();
-        let res = self.verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str())).unwrap();
+        let w = self
+            .generate_w(
+                key.as_str(),
+                gt.as_str(),
+                challenge.as_str(),
+                serde_json::to_string(&c).unwrap().as_str(),
+                s.as_str(),
+                rt,
+            )
+            .unwrap();
+        let res = self
+            .verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str()))
+            .unwrap();
         println!("{:?}", res);
     }
 }
@@ -204,7 +235,11 @@ impl Api for Click<'_> {
         ))
     }
 
-    fn get_new_c_s_args(&self, gt: &str, challenge: &str) -> Result<(Vec<u8>, String, Self::ArgsType)> {
+    fn get_new_c_s_args(
+        &self,
+        gt: &str,
+        challenge: &str,
+    ) -> Result<(Vec<u8>, String, Self::ArgsType)> {
         let url = "http://api.geevisit.com/get.php";
         let mut params = HashMap::from([
             ("gt", gt),
@@ -221,7 +256,12 @@ impl Api for Click<'_> {
                 VerifyType::Slide => "slide",
             },
         );
-        let res = self.client.get(url).query(&params).send().map_err(net_work_error)?;
+        let res = self
+            .client
+            .get(url)
+            .query(&params)
+            .send()
+            .map_err(net_work_error)?;
         let res = res.text().map_err(|e| other("什么b玩意错误", e))?;
         let res = res
             .strip_prefix("geetest_1717915671544(")
@@ -230,7 +270,9 @@ impl Api for Click<'_> {
             .ok_or_else(|| other_without_source("后缀错误"))?;
         let res: Value = serde_json::from_str(res).map_err(parse_error)?;
         let res = res.get("data").ok_or_else(|| missing_param("data"))?;
-        let c: Vec<u8> = serde_json::from_value(res.get("c").ok_or_else(|| missing_param("c"))?.clone()).map_err(parse_error)?;
+        let c: Vec<u8> =
+            serde_json::from_value(res.get("c").ok_or_else(|| missing_param("c"))?.clone())
+                .map_err(parse_error)?;
         let static_server = res
             .get("static_servers")
             .ok_or_else(|| missing_param("static_servers"))?
@@ -242,7 +284,11 @@ impl Api for Click<'_> {
             .ok_or_else(|| other_without_source("static_servers里面咋没东西啊"))?;
         Ok((
             c,
-            res.get("s").ok_or_else(|| missing_param("s"))?.as_str().ok_or_else(|| missing_param("s"))?.to_string(),
+            res.get("s")
+                .ok_or_else(|| missing_param("s"))?
+                .as_str()
+                .ok_or_else(|| missing_param("s"))?
+                .to_string(),
             format!(
                 "https://{}{}",
                 static_server,
@@ -266,7 +312,12 @@ impl Api for Click<'_> {
         if let Some(w) = w {
             params.insert("w", w);
         }
-        let res = self.client().get(url).query(&params).send().map_err(net_work_error)?;
+        let res = self
+            .client()
+            .get(url)
+            .query(&params)
+            .send()
+            .map_err(net_work_error)?;
         let res = res.text().map_err(|e| other("什么b玩意错误", e))?;
         let res = res
             .strip_prefix("geetest_1717918222610(")
@@ -390,7 +441,10 @@ impl GenerateW for Click<'_> {
         rt: &str,
     ) -> Result<String> {
         let params = vec![key, gt, challenge, c, s, rt];
-        let out_put = Command::new(".\\click.exe").args(&params).output().map_err(|e| other("click.exe命令行错误", e))?;
+        let out_put = Command::new(".\\click.exe")
+            .args(&params)
+            .output()
+            .map_err(|e| other("click.exe命令行错误", e))?;
         Ok(String::from_utf8_lossy(&out_put.stdout).to_string())
     }
 }
