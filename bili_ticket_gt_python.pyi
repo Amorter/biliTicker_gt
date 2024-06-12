@@ -1,3 +1,4 @@
+from typing import Tuple
 class SlidePy:
     """
     滑块验证码封装类
@@ -8,14 +9,14 @@ class SlidePy:
         否则会降低程序运行速度
         """
 
-    def register_test(self, url: str) -> (str, str):
+    def register_test(self, url: str) -> Tuple[str, str]:
         """
         注册验证码
         :param url: 注册验证码challenge和gt的url
         :return: gt, challenge
         """
 
-    def get_c_s(self, gt: str, challenge: str, w: str = None) -> (list, str):
+    def get_c_s(self, gt: str, challenge: str, w: str = None) -> Tuple[list, str]:
         """
         获取c_s
         :param gt: gt
@@ -33,7 +34,7 @@ class SlidePy:
         :return: type(slide或click)
         """
 
-    def get_new_c_s_args(self, gt: str, challenge: str) -> (list, str, (str, str, str, str)):
+    def get_new_c_s_args(self, gt: str, challenge: str) -> Tuple[list, str, Tuple[str, str, str, str]]:
         """
         获取新的c_s参数和验证所需参数
         :param gt: gt
@@ -41,7 +42,7 @@ class SlidePy:
         :return: c, s, args(new_challenge, 完整背景图url, 缺口背景图url, 滑块图url)
         """
 
-    def calculate_key(self, args: (str, str, str, str)) -> str:
+    def calculate_key(self, args: Tuple[str, str, str, str]) -> str:
         """
         计算生成w所需关键参数
         :param args: new_challenge, 完整背景图url, 缺口背景图url, 滑块图url
@@ -60,7 +61,7 @@ class SlidePy:
         :return: w
         """
 
-    def verify(self, gt: str, challenge: str, w: str) -> (str, str):
+    def verify(self, gt: str, challenge: str, w: str) -> Tuple[str, str]:
         """
         验证
         :param gt: gt
@@ -85,14 +86,14 @@ class ClickPy:
         否则会降低程序运行速度
         """
 
-    def register_test(self, url: str) -> (str, str):
+    def register_test(self, url: str) -> Tuple[str, str]:
         """
         注册验证码
         :param url: 注册验证码challenge和gt的url
         :return: gt, challenge
         """
 
-    def get_c_s(self, gt: str, challenge: str, w: str = None) -> (list, str):
+    def get_c_s(self, gt: str, challenge: str, w: str = None) -> Tuple[list, str]:
         """
         获取c_s
         :param gt: gt
@@ -110,7 +111,7 @@ class ClickPy:
         :return: type(slide或click)
         """
 
-    def get_new_c_s_args(self, gt: str, challenge: str) -> (list, str, str):
+    def get_new_c_s_args(self, gt: str, challenge: str) -> Tuple[list, str, str]:
         """
         获取新的c_s参数和验证所需参数
         :param gt: gt
@@ -137,7 +138,7 @@ class ClickPy:
         :return: w
         """
 
-    def verify(self, gt: str, challenge: str, w: str) -> (str, str):
+    def verify(self, gt: str, challenge: str, w: str) -> Tuple[str, str]:
         """
         验证
         :param gt: gt
