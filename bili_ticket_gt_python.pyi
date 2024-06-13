@@ -70,10 +70,11 @@ class SlidePy:
         :return: message, validate
         """
 
-    def test(self, url: str):
+    def test(self, url: str) -> str:
         """
         测试
         :param url: 注册验证码challenge和gt的url
+        :return validate
         """
 
 class ClickPy:
@@ -147,8 +148,9 @@ class ClickPy:
         :return: message, validate
         """
 
-    def test(self, url: str):
+    def test(self, url: str) -> str:
         """
         测试
         :param url: 注册验证码challenge和gt的url
+        :return validate
         """

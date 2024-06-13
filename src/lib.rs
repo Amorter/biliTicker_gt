@@ -1,6 +1,3 @@
-use crate::implement::Slide;
-use pyo3::prelude::*;
-
 mod abstraction;
 mod error;
 mod implement;
@@ -15,13 +12,18 @@ mod tests {
     #[test]
     fn slide_test() {
         let mut slide = Slide::default();
-        slide.test("http://127.0.0.1:5000/pc-geetest/register");
+        let validate = slide
+            .test("http://127.0.0.1:5000/pc-geetest/register")
+            .unwrap();
+        println!("{}", validate);
     }
 
     #[test]
     fn click_test() {
         let mut click = Click::default();
-        click.test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web");
+        click
+            .test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
+            .unwrap();
     }
 
     #[test]
@@ -31,7 +33,8 @@ mod tests {
         for _ in 1..=100 {
             let r = std::panic::catch_unwind(AssertUnwindSafe(|| {
                 click
-                    .test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web");
+                    .test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
+                    .unwrap();
             }));
 
             if r.is_ok() {

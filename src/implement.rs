@@ -167,30 +167,25 @@ impl GenerateW for Slide {
 }
 
 impl Test for Slide {
-    fn test(&mut self, url: &str) {
+    fn test(&mut self, url: &str) -> Result<String> {
         let rt = "82253e788a7b95e9";
-        let (gt, mut challenge) = self.register_test(url).unwrap();
-        let (_, _) = self.get_c_s(gt.as_str(), challenge.as_str(), None).unwrap();
-        let _ = self.get_type(gt.as_str(), challenge.as_str(), None);
-        let (c, s, args) = self
-            .get_new_c_s_args(gt.as_str(), challenge.as_str())
-            .unwrap();
+        let (gt, mut challenge) = self.register_test(url)?;
+        let (_, _) = self.get_c_s(gt.as_str(), challenge.as_str(), None)?;
+        let _ = self.get_type(gt.as_str(), challenge.as_str(), None)?;
+        let (c, s, args) = self.get_new_c_s_args(gt.as_str(), challenge.as_str())?;
         challenge = args.0.clone();
-        let key = self.calculate_key(args).unwrap();
-        let w = self
-            .generate_w(
-                key.as_str(),
-                gt.as_str(),
-                challenge.as_str(),
-                serde_json::to_string(&c).unwrap().as_str(),
-                s.as_str(),
-                rt,
-            )
-            .unwrap();
-        let res = self
-            .verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str()))
-            .unwrap();
-        println!("{:?}", res);
+        let key = self.calculate_key(args)?;
+        let w = self.generate_w(
+            key.as_str(),
+            gt.as_str(),
+            challenge.as_str(),
+            serde_json::to_string(&c).unwrap().as_str(),
+            s.as_str(),
+            rt,
+        )?;
+        let (_, validate) =
+            self.verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str()))?;
+        Ok(validate)
     }
 }
 
@@ -325,9 +320,7 @@ impl Api for Click<'_> {
             .strip_suffix(")")
             .ok_or_else(|| other_without_source("后缀错误"))?;
         let res: Value = serde_json::from_str(res).map_err(parse_error)?;
-        println!("{:?}", res);
         let res = res.get("data").ok_or_else(|| missing_param("data"))?;
-        println!("{:?}", res);
         Ok((
             res.get("result")
                 .ok_or_else(|| missing_param("result"))?

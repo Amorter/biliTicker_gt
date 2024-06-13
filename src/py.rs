@@ -86,8 +86,8 @@ impl SlidePy {
             .map_err(PyErr::from)
     }
 
-    fn test(&mut self, url: &str) {
-        self.inner.test(url);
+    fn test(&mut self, url: &str) -> PyResult<String> {
+        self.inner.test(url).map_err(PyErr::from)
     }
 }
 
@@ -159,7 +159,7 @@ impl ClickPy {
             .map_err(PyErr::from)
     }
 
-    fn test(&mut self, url: &str) {
-        self.inner.test(url);
+    fn test(&mut self, url: &str) -> PyResult<String> {
+        self.inner.test(url).map_err(PyErr::from)
     }
 }
