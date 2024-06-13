@@ -64,6 +64,7 @@ except Exception as e:
 
 ```python
 import bili_ticket_gt_python
+import time
 click = bili_ticket_gt_python.ClickPy()
 
 try:
@@ -73,10 +74,16 @@ try:
     if _type != "click":
         raise Exception("验证码类型错误")
     (c, s, args) = click.get_new_c_s_args(gt, challenge)
+    before_calculate_key = time.time()
     key = click.calculate_key(args)
     #rt固定即可
     #此函数是使用项目目录下的click.exe生成w参数，如果文件不存在会报错，你也可以自己接入生成w的逻辑函数
     w = click.generate_w(key, gt, challenge, str(c), s, "abcdefghijklmnop")
+    #点选验证码生成w后需要等待2秒提交
+    w_use_time = time.time() - before_calculate_key
+    print("w生成时间：", w_use_time)
+    if w_use_time < 2:
+        time.sleep(2 - w_use_time)
     (msg, validate) = click.verify(gt, challenge, w)
     print(validate)
 except Exception as e:
