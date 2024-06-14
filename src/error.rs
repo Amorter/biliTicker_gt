@@ -41,14 +41,7 @@ impl Debug for Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self.inner.kind {
-            Kind::NetWorkError => f.write_str("网络错误")?,
-            Kind::MissingParam(ref s) => f.write_str(format!("缺少参数 {}", s).as_str())?,
-            Kind::ParseError => f.write_str("解析错误")?,
-            Kind::Other(ref s) => f.write_str(s)?,
-        }
-
-        Ok(())
+        Debug::fmt(&self, f)
     }
 }
 

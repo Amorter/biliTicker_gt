@@ -4,11 +4,12 @@ use crate::error::{
 };
 use ddddocr::{BBox, CharsetRange, Ddddocr};
 use image::{GenericImage, ImageFormat};
+use pyo3::prelude::*;
+use pyo3::{Python};
 use reqwest::blocking::Client;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::io::Cursor;
-use std::process::Command;
 
 pub struct Slide {
     client: Client,
@@ -157,12 +158,16 @@ impl GenerateW for Slide {
         s: &str,
         rt: &str,
     ) -> Result<String> {
-        let params = vec![key, gt, challenge, c, s, rt];
-        let out_put = Command::new(".\\slide.exe")
-            .args(&params)
-            .output()
-            .map_err(|e| other("slide.exe命令行错误", e))?;
-        Ok(String::from_utf8_lossy(&out_put.stdout).to_string())
+        Python::with_gil(|py| {
+            let w_module =
+                PyModule::import_bound(py, "bili_ticket_gt_python").map_err(|e| other("w模块导入失败", e))?;
+            let w = w_module
+                .call_method1("slide_w", (key, gt, challenge, c, s, rt))
+                .map_err(|e| other("w模块调用失败", e))?
+                .extract()
+                .map_err(|e| other("w模块返回值解析失败", e))?;
+            Ok(w)
+        })
     }
 }
 
@@ -433,12 +438,16 @@ impl GenerateW for Click<'_> {
         s: &str,
         rt: &str,
     ) -> Result<String> {
-        let params = vec![key, gt, challenge, c, s, rt];
-        let out_put = Command::new(".\\click.exe")
-            .args(&params)
-            .output()
-            .map_err(|e| other("click.exe命令行错误", e))?;
-        Ok(String::from_utf8_lossy(&out_put.stdout).to_string())
+        Python::with_gil(|py| {
+            let w_module =
+                PyModule::import_bound(py, "bili_ticket_gt_python").map_err(|e| other("w模块导入失败", e))?;
+            let w = w_module
+                .call_method1("click_w", (key, gt, challenge, c, s, rt))
+                .map_err(|e| other("w模块调用失败", e))?
+                .extract()
+                .map_err(|e| other("w模块返回值解析失败", e))?;
+            Ok(w)
+        })
     }
 }
 
