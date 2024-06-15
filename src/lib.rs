@@ -1,13 +1,14 @@
 mod abstraction;
+mod click;
 mod error;
-mod implement;
 mod py;
+mod slide;
 
 #[cfg(test)]
 mod tests {
-    use crate::abstraction::Test;
-    use crate::implement::{Click, Slide};
-    use std::panic::AssertUnwindSafe;
+    use crate::abstraction::{Api, Test};
+    use crate::click::Click;
+    use crate::slide::Slide;
 
     #[test]
     fn slide_test() {
@@ -29,18 +30,10 @@ mod tests {
     #[test]
     fn click_test_batch() {
         let mut click = Click::default();
-        let mut suc = 0;
-        for _ in 1..=100 {
-            let r = std::panic::catch_unwind(AssertUnwindSafe(|| {
-                click
-                    .test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
-                    .unwrap();
-            }));
-
-            if r.is_ok() {
-                suc += 1;
-            }
-        }
-        println!("suc: {}", suc as f32 / 100f32);
+        let (gt, challenge) = click
+            .register_test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
+            .unwrap();
+        let validate = click.simple_match(gt.as_str(), challenge.as_str()).unwrap();
+        println!("{}", validate);
     }
 }

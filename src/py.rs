@@ -1,6 +1,7 @@
 use crate::abstraction::{Api, GenerateW, Test, VerifyType};
+use crate::click::Click;
 use crate::error::Error;
-use crate::implement::{Click, Slide};
+use crate::slide::Slide;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::PyModule;
 use pyo3::{pyclass, pymethods, pymodule, Bound, PyErr, PyResult};
@@ -161,5 +162,15 @@ impl ClickPy {
 
     fn test(&mut self, url: &str) -> PyResult<String> {
         self.inner.test(url).map_err(PyErr::from)
+    }
+
+    fn simple_match(&mut self, gt: &str, challenge: &str) -> PyResult<String> {
+        self.inner.simple_match(gt, challenge).map_err(PyErr::from)
+    }
+
+    fn simple_match_retry(&mut self, gt: &str, challenge: &str) -> PyResult<String> {
+        self.inner
+            .simple_match_retry(gt, challenge)
+            .map_err(PyErr::from)
     }
 }

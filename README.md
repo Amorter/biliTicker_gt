@@ -4,11 +4,10 @@
 ### 使用方式
 
 1. pip install bili_ticket_gt_python
-2. 将[click.exe和slide.exe](https://github.com/Amorter/biliTicker_gt/releases/tag/v0.1.2)放入项目目录下
-3. import bili_ticket_gt_python
-4. slide = bili_ticket_gt_python.SlidePy()
-5. click = bili_ticket_gt_python.ClickPy()
-6. 通过slide和click调用相关函数
+2. import bili_ticket_gt_python
+3. slide = bili_ticket_gt_python.SlidePy()
+4. click = bili_ticket_gt_python.ClickPy()
+5. 通过slide和click调用相关函数
 
 绑定的函数见py.rs文件
 ## demo
@@ -34,6 +33,37 @@ try:
 except Exception as e:
     print("识别失败")
     print(e)
+```
+
+### 通过gt和challenge调用 仅支持点选验证码
+```python
+import bili_ticket_gt_python
+click = bili_ticket_gt_python.ClickPy()
+try:
+    (gt, challenge) = click.register_test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
+    validate = click.simple_match(gt, challenge)
+    print(validate)
+except Exception as e:
+    print("识别失败")
+    print(e)
+```
+
+### 通过gt和challenge调用(自动重试) 仅支持点选验证码
+```python
+import bili_ticket_gt_python
+click = bili_ticket_gt_python.ClickPy()
+
+try:
+    (gt, challenge) = click.register_test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
+    validate = click.simple_match_retry(gt, challenge)
+    print(validate)
+except Exception as e:
+    #验证码失效有两种可能性
+    # 1. 验证码生成过后过了太久，时间导致的失效
+    # 2. 验证码重试次数过多，需要unset，unset接口请自己扒下来封装吧，我真的懒得封装了
+    print("自动重试仍然有极小概率报错(超时时间即为验证码失效时间)")
+    print(e)
+#不要100%依赖于demo！！！动动脑子
 ```
 
 

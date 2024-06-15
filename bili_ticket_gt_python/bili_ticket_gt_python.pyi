@@ -154,3 +154,19 @@ class ClickPy:
         :param url: 注册验证码challenge和gt的url
         :return validate
         """
+
+    def simple_match(self, gt: str, challenge: str) -> str:
+        """
+        根据gt和challenge自动验证
+        :param gt: gt
+        :param challenge: challenge
+        :return: validate
+        """
+
+    def simple_match_retry(self, gt: str, challenge: str) -> str:
+        """
+        根据gt和challenge自动验证，如果验证失败则重试
+        :param gt: gt
+        :param challenge: challenge
+        :return: validate
+        """

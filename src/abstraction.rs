@@ -4,8 +4,7 @@ use crate::error::{
 use reqwest::blocking::Client;
 use serde_json::Value;
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
+
 pub(crate) enum VerifyType {
     Slide,
     Click,
@@ -126,42 +125,13 @@ pub(crate) trait Api {
     /// #### 返回值
     /// - message
     /// - validate
-    fn verify(&self, gt: &str, challenge: &str, w: Option<&str>) -> Result<(String, String)> {
-        let url = "http://api.geevisit.com/ajax.php";
-        let mut params = HashMap::from([
-            ("gt", gt),
-            ("challenge", challenge),
-            ("callback", "geetest_1717918222610"),
-        ]);
-        if let Some(w) = w {
-            params.insert("w", w);
-        }
-        let res = self
-            .client()
-            .get(url)
-            .query(&params)
-            .send()
-            .map_err(net_work_error)?;
-        let res = res.text().unwrap();
-        let res = res
-            .strip_prefix("geetest_1717918222610(")
-            .ok_or_else(|| other_without_source("前缀错误"))?
-            .strip_suffix(")")
-            .ok_or_else(|| other_without_source("后缀错误"))?;
-        let res: Value = serde_json::from_str(res).unwrap();
-        Ok((
-            res.get("message")
-                .ok_or_else(|| missing_param("message"))?
-                .as_str()
-                .ok_or_else(|| missing_param("message"))?
-                .to_string(),
-            res.get("validate")
-                .ok_or_else(|| missing_param("validate"))?
-                .as_str()
-                .ok_or_else(|| missing_param("validate"))?
-                .to_string(),
-        ))
-    }
+    fn verify(&self, gt: &str, challenge: &str, w: Option<&str>) -> Result<(String, String)>;
+
+    /// ### 刷新
+    /// #### 返回值
+    /// - args: 计算key用到的参数
+    fn refresh(&self, gt: &str, challenge: &str) -> Result<Self::ArgsType>;
+
     /// ### 下载图片
     /// #### 返回值
     /// - img
@@ -191,24 +161,5 @@ pub(crate) trait GenerateW: Api {
 
 pub(crate) trait Test: Api + GenerateW {
     /// ### 测试
-    fn test(&mut self, url: &str) -> Result<String> {
-        let rt = "82253e788a7b95e9";
-        let (gt, challenge) = self.register_test(url)?;
-        let (_, _) = self.get_c_s(gt.as_str(), challenge.as_str(), None)?;
-        let _ = self.get_type(gt.as_str(), challenge.as_str(), None)?;
-        let (c, s, args) = self.get_new_c_s_args(gt.as_str(), challenge.as_str())?;
-        let key = self.calculate_key(args)?;
-        let w = self.generate_w(
-            key.as_str(),
-            gt.as_str(),
-            challenge.as_str(),
-            serde_json::to_string(&c).unwrap().as_str(),
-            s.as_str(),
-            rt,
-        )?;
-        sleep(Duration::new(2, 0));
-        let (_, validate) =
-            self.verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str()))?;
-        Ok(validate)
-    }
+    fn test(&mut self, url: &str) -> Result<String>;
 }
