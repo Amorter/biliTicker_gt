@@ -408,7 +408,6 @@ impl Click<'_> {
             rt,
         )?;
         let elapsed = start.elapsed();
-        println!("生成w耗时: {:?}", elapsed.as_millis());
         if elapsed < Duration::from_secs(2) {
             let sleep_duration = Duration::from_secs(2) - elapsed;
             sleep(sleep_duration);
