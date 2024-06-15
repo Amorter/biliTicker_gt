@@ -1,6 +1,6 @@
 [package]
 name = "biliTicker-gt"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 
 [lib]
@@ -13,5 +13,5 @@ serde = "1.0"
 serde_json = "1.0"
 ddddocr = { git = "https://github.com/86maid/ddddocr", branch = "master" }
 image = "0.25"
-
 pyo3 = { version = "0.21.2", features = ["auto-initialize", "extension-module"]}
+mini-v8 = "0.4.1"

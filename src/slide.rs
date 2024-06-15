@@ -3,12 +3,11 @@ use crate::error::{
     missing_param, net_work_error, other, other_without_source, parse_error, Result,
 };
 use image::{GenericImage, ImageFormat};
-use pyo3::prelude::*;
-use pyo3::Python;
 use reqwest::blocking::Client;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::io::Cursor;
+use mini_v8::{Function, MiniV8};
 
 pub struct Slide {
     client: Client,
@@ -198,16 +197,8 @@ impl GenerateW for Slide {
         s: &str,
         rt: &str,
     ) -> Result<String> {
-        Python::with_gil(|py| {
-            let w_module = PyModule::import_bound(py, "bili_ticket_gt_python")
-                .map_err(|e| other("w模块导入失败", e))?;
-            let w = w_module
-                .call_method1("slide_w", (key, gt, challenge, c, s, rt))
-                .map_err(|e| other("w模块调用失败", e))?
-                .extract()
-                .map_err(|e| other("w模块返回值解析失败", e))?;
-            Ok(w)
-        })
+        let slide_w: Function = MiniV8::new().eval(include_str!("../js/slide.js")).map_err(|_| other_without_source("js运行时创建失败"))?;
+        slide_w.call((key, gt, challenge, c, s, rt)).map_err(|_| other_without_source("js运行时出错"))
     }
 }
 
