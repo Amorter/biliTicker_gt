@@ -1,5 +1,5 @@
 *.pyd
 target/
 Cargo.lock
-*.dll
-*.so.*
+# *.dll
+# bili_ticket_gt_python/*.so.*
