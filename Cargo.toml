@@ -1,6 +1,6 @@
 [package]
-name = "biliTicker-gt"
-version = "0.2.2"
+name = "bili_ticket_gt_python"
+version = "0.2.3"
 edition = "2021"
 
 [lib]

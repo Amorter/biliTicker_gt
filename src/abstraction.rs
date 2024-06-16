@@ -10,7 +10,7 @@ pub(crate) enum VerifyType {
     Click,
 }
 
-pub(crate) trait Api {
+trait Api {
     type ArgsType;
     /// ### 申请验证码
     /// #### 返回值
