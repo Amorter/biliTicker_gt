@@ -1,3 +1,5 @@
 *.pyd
 target/
 Cargo.lock
+*.dll
+*.so.*
