@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         platform:
-          - runner: windows-latest
+          - runner: windows-2019
             target: x64
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
     strategy:
       matrix:
         platform:
-          - runner: ubuntu-latest
+          - runner: ubuntu-20.04
             target: x64
     steps:
       - uses: actions/checkout@v4
