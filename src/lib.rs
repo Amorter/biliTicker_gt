@@ -22,18 +22,21 @@ mod tests {
     #[test]
     fn click_test() {
         let mut click = Click::default();
-        click
+        let validate = click
             .test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
             .unwrap();
+        println!("{}", validate);
     }
 
     #[test]
     fn click_test_batch() {
         let mut click = Click::default();
-        let (gt, challenge) = click
-            .register_test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
-            .unwrap();
-        let validate = click.simple_match(gt.as_str(), challenge.as_str()).unwrap();
-        println!("{}", validate);
+        for i in 1..=100 {
+            let (gt, challenge) = click
+                .register_test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
+                .unwrap();
+            let validate = click.simple_match_retry(gt.as_str(), challenge.as_str()).unwrap();
+            println!("{}", validate);
+        }
     }
 }
