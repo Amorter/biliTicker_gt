@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         platform:
-          - runner: windows-2019
+          - runner: windows-latest
             target: x64
     steps:
       - uses: actions/checkout@v4
