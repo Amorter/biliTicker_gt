@@ -80,7 +80,7 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          target: arm
+          # target: arm
           args: --release --out dist --find-interpreter
           sccache: 'true'
       - name: Upload wheels
