@@ -75,7 +75,7 @@ jobs:
       matrix:
         platform:
           - runner: macos-latest
-            target: arm64
+            target: arm
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
