@@ -220,7 +220,7 @@ impl GenerateW for Click<'_> {
         let pic_img = image::load_from_memory(&pic_img).map_err(|e| other("图片加载失败", e))?;
         let bg_img = pic_img.crop_imm(0, 0, 344, 344);
         let text_img = pic_img.crop_imm(0, 345, 116, 40);
-        let mut text = Vec::with_capacity(2);
+        let mut text = Vec::new();
 
         //识别题目文字
         let mut text_bytes = Cursor::new(Vec::new());
@@ -233,7 +233,8 @@ impl GenerateW for Click<'_> {
             .ocr
             .classification_probability(text_bytes.into_inner(), false)
             .expect("ddddocr内部错误")
-            .get_text();
+            .get_text()
+            .to_string();
 
         //目标检测+识别背景图中文字
         let mut bg_bytes = Cursor::new(Vec::new());
@@ -254,8 +255,13 @@ impl GenerateW for Click<'_> {
             text.push(c);
         }
 
+        //如果一张没检测到，直接Result
+        if text.is_empty() {
+            return Err(other_without_source("背景图中未识别到文字"));
+        }
+
         //求检测出来包含在题目中的最大可能性
-        let mut max_vec = vec![(1, 0f32); s.chars().count()];
+        let mut max_vec = vec![(0, 0f32); s.chars().count()];
         //检测的可能性
         for (idx_cp, cp) in text.iter().enumerate() {
             let mut pos = Vec::with_capacity(s.len());
@@ -277,7 +283,7 @@ impl GenerateW for Click<'_> {
                 }
             }
         }
-
+    
         //遍历题目
         let mut res = Vec::with_capacity(s.chars().count());
         for (idx, _) in max_vec {
