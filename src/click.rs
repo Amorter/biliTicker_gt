@@ -6,7 +6,7 @@ use ddddocr::{BBox, CharsetRange, Ddddocr};
 use image::ImageFormat;
 use reqwest::blocking::Client;
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::io::Cursor;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
@@ -286,8 +286,11 @@ impl GenerateW for Click<'_> {
     
         //遍历题目
         let mut res = Vec::with_capacity(s.chars().count());
-        for (idx, _) in max_vec {
-            let bbox: &BBox = bg_det.get(idx).expect("未知错误");
+
+        let mut set = HashSet::new();
+        for (idx, _) in &max_vec {
+            set.insert(idx);
+            let bbox: &BBox = bg_det.get(idx.clone()).expect("未知错误");
             let x = (bbox.x1 + bbox.x2) / 2;
             let y = (bbox.y1 + bbox.y2) / 2;
             let position = format!(
@@ -297,6 +300,10 @@ impl GenerateW for Click<'_> {
             );
             res.push(position);
         }
+        if max_vec.len() != set.len() {
+            return Err(other_without_source("验证码自查出现错误"));
+        }
+
         Ok(res.join(","))
     }
 
@@ -381,6 +388,8 @@ impl Click<'_> {
             let res = self.vvv(gt, challenge, &c, s.as_str(), rt, args);
             if res.is_ok() {
                 return res;
+            } else {
+                println!("{}", res.err().unwrap())
             }
         }
     }
@@ -409,6 +418,9 @@ impl Click<'_> {
             let sleep_duration = Duration::from_secs(2) - elapsed;
             sleep(sleep_duration);
         }
+
+
+
         let (_, validate) = self.verify(gt, challenge, Option::from(w.as_str()))?;
         Ok(validate)
     }

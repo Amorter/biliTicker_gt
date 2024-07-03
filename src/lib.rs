@@ -8,6 +8,8 @@ mod slide;
 
 #[cfg(test)]
 mod tests {
+    use std::time::Instant;
+
     use crate::abstraction::{Api, GenerateW, Test};
     use crate::click::Click;
     use crate::slide::Slide;
@@ -33,13 +35,17 @@ mod tests {
     #[test]
     fn click_test_batch() {
         let mut click = Click::default();
-        for i in 1..=100 {
+        for _ in 1..=100 {
+            let start = Instant::now();
             let (gt, challenge) = click
                 .register_test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
                 .unwrap();
             let validate = click.simple_match_retry(gt.as_str(), challenge.as_str()).unwrap();
             println!("{}", validate);
+            let end = Instant::now() - start;
+            println!("{:?}", end);
         }
+       
     }
 
 
