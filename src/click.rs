@@ -388,8 +388,6 @@ impl Click<'_> {
             let res = self.vvv(gt, challenge, &c, s.as_str(), rt, args);
             if res.is_ok() {
                 return res;
-            } else {
-                println!("{}", res.err().unwrap())
             }
         }
     }

@@ -35,7 +35,10 @@ mod tests {
     #[test]
     fn click_test_batch() {
         let mut click = Click::default();
-        for _ in 1..=100 {
+
+        let sstart = Instant::now();
+        for i in 1..=100 {
+            println!("{}", i);
             let start = Instant::now();
             let (gt, challenge) = click
                 .register_test("https://passport.bilibili.com/x/passport-login/captcha?source=main_web")
@@ -45,7 +48,7 @@ mod tests {
             let end = Instant::now() - start;
             println!("{:?}", end);
         }
-       
+        println!("avage: {}s", (Instant::now() - sstart).as_secs_f64()/ 100f64);
     }
 
 
