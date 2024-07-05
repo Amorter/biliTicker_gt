@@ -1,6 +1,9 @@
 # BiliTicker-gt-python
 ## 极验验证模块的python语言绑定
 
+### 赞助
+[爱发电(秦诗染)](https://afdian.net/a/amort)
+
 ### 使用方式
 
 1. pip install bili_ticket_gt_python
