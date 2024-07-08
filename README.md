@@ -43,6 +43,8 @@
 - 100****684  五条新菜
 - 112****460  [亚里士多缺德](https://github.com/Teeedy)
 - 994205135   [Anli](https://github.com/AkiCCLing)
+- 223****994  比企谷雪乃
+
 
 ### 使用方式
 
