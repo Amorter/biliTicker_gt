@@ -42,7 +42,7 @@
 - 137****726  [Kizuna_AI](https://github.com/Kizuna-AI0630)
 - 100****684  五条新菜
 - 112****460  [亚里士多缺德](https://github.com/Teeedy)
-- 994205135   [Anli](https://github.com/AkiCCLing)
+- 99****135   [Anli](https://github.com/AkiCCLing)
 - 223****994  比企谷雪乃
 
 
