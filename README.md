@@ -1,4 +1,4 @@
-# BiliTicker-gt-python
+![image](https://github.com/Amorter/biliTicker_gt/assets/63935225/92f88dc6-545c-4b92-97eb-de8fa490ca14)# BiliTicker-gt-python
 ## 极验验证模块的python语言绑定
 
 ### 赞助
@@ -52,6 +52,8 @@
 - 247****056  南楚冥灵
 - 144****247  yuanzi.
 - 181****302  吾妻槿夜
+- 269****949
+- 25****883
 
 ### 使用方式
 
