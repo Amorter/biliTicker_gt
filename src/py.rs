@@ -4,6 +4,7 @@ use crate::error::Error;
 use crate::slide::Slide;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::PyModule;
+use pyo3::types::PyModuleMethods;
 use pyo3::{pyclass, pymethods, pymodule, Bound, PyErr, PyResult};
 
 #[pymodule]
