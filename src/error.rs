@@ -30,7 +30,12 @@ impl Debug for Error {
         let mut builder = f.debug_struct("bili_ticket极验模块错误");
 
         builder.field("错误类型", &self.inner.kind);
-
+        match &self.inner.kind {
+            Kind::NetWorkError => {}
+            Kind::MissingParam(s) => {builder.field("信息", s);}
+            Kind::ParseError => {}
+            Kind::Other(s) => {builder.field("信息", s);}
+        }
         if let Some(ref source) = self.inner.source {
             builder.field("源", source);
         }

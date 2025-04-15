@@ -10,7 +10,7 @@ use std::collections::{HashMap, HashSet};
 use std::io::Cursor;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
-use mini_v8::{Function, MiniV8};
+use crate::w::click_calculate;
 
 pub struct Click<'a> {
     client: Client,
@@ -214,7 +214,7 @@ impl GenerateW for Click<'_> {
     /// ### 计算滑块的关键参数
     /// #### 返回值
     /// - positions
-    fn calculate_key(&mut self, args: Self::ArgsType) -> crate::error::Result<String> {
+    fn calculate_key(&mut self, args: Self::ArgsType) -> Result<String> {
         let pic_url = args;
         let pic_img = self.download_img(pic_url.as_str())?;
         let pic_img = image::load_from_memory(&pic_img).map_err(|e| other("图片加载失败", e))?;
@@ -312,18 +312,15 @@ impl GenerateW for Click<'_> {
         key: &str,
         gt: &str,
         challenge: &str,
-        c: &str,
+        c: &[u8],
         s: &str,
-        rt: &str,
     ) -> Result<String> {
-        let click_w: Function = MiniV8::new().eval(include_str!("../js/click.js")).map_err(|_| other_without_source("js运行时创建失败"))?;
-        click_w.call((key, gt, challenge, c, s, rt)).map_err(|_| other_without_source("js运行时出错"))
+        Ok(click_calculate(key, gt, challenge))
     }
 }
 
 impl Test for Click<'_> {
     fn test(&mut self, url: &str) -> Result<String> {
-        let rt = "82253e788a7b95e9";
         let (gt, challenge) = self.register_test(url)?;
         let (_, _) = self.get_c_s(gt.as_str(), challenge.as_str(), None)?;
         let _ = self.get_type(gt.as_str(), challenge.as_str(), None)?;
@@ -333,10 +330,10 @@ impl Test for Click<'_> {
             key.as_str(),
             gt.as_str(),
             challenge.as_str(),
-            serde_json::to_string(&c).unwrap().as_str(),
+            c.as_ref(),
             s.as_str(),
-            rt,
         )?;
+
         sleep(Duration::new(2, 0));
         let (_, validate) =
             self.verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str()))?;
@@ -346,7 +343,6 @@ impl Test for Click<'_> {
 
 impl Click<'_> {
     pub fn simple_match(&mut self, gt: &str, challenge: &str) -> Result<String> {
-        let rt = "82253e788a7b95e9";
         let (_, _) = self.get_c_s(gt, challenge, None)?;
         let _ = self.get_type(gt, challenge, None)?;
         let (c, s, args) = self.get_new_c_s_args(gt, challenge)?;
@@ -356,9 +352,8 @@ impl Click<'_> {
             key.as_str(),
             gt,
             challenge,
-            serde_json::to_string(&c).unwrap().as_str(),
+            c.as_ref(),
             s.as_str(),
-            rt,
         )?;
 
         let elapsed = start.elapsed();
@@ -373,19 +368,18 @@ impl Click<'_> {
 
     /// ### 自动重试的验证(还是可能产生错误)
     pub fn simple_match_retry(&mut self, gt: &str, challenge: &str) -> Result<String> {
-        let rt = "82253e788a7b95e9";
         let (_, _) = self.get_c_s(gt, challenge, None)?;
         let _ = self.get_type(gt, challenge, None)?;
         let (c, s, args) = self.get_new_c_s_args(gt, challenge)?;
 
-        let res = self.vvv(gt, challenge, &c, s.as_str(), rt, args);
+        let res = self.vvv(gt, challenge, &c, s.as_str(), args);
         if res.is_ok() {
             return res;
         }
 
         loop {
             let args = self.refresh(gt, challenge)?;
-            let res = self.vvv(gt, challenge, &c, s.as_str(), rt, args);
+            let res = self.vvv(gt, challenge, &c, s.as_str(), args);
             if res.is_ok() {
                 return res;
             }
@@ -398,7 +392,6 @@ impl Click<'_> {
         challenge: &str,
         c: &Vec<u8>,
         s: &str,
-        rt: &str,
         args: String,
     ) -> Result<String> {
         let start = Instant::now();
@@ -407,17 +400,14 @@ impl Click<'_> {
             key.as_str(),
             gt,
             challenge,
-            serde_json::to_string(&c).unwrap().as_str(),
+            c.as_ref(),
             s,
-            rt,
         )?;
         let elapsed = start.elapsed();
         if elapsed < Duration::from_secs(2) {
             let sleep_duration = Duration::from_secs(2) - elapsed;
             sleep(sleep_duration);
         }
-
-
 
         let (_, validate) = self.verify(gt, challenge, Option::from(w.as_str()))?;
         Ok(validate)

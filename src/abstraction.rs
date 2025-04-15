@@ -153,9 +153,8 @@ pub(crate) trait GenerateW: Api {
         key: &str,
         gt: &str,
         challenge: &str,
-        c: &str,
+        c: &[u8],
         s: &str,
-        rt: &str,
     ) -> Result<String>;
 }
 

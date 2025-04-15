@@ -7,7 +7,7 @@ use reqwest::blocking::Client;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::io::Cursor;
-use mini_v8::{Function, MiniV8};
+use crate::w::slide_calculate;
 
 pub struct Slide {
     client: Client,
@@ -193,32 +193,22 @@ impl GenerateW for Slide {
         key: &str,
         gt: &str,
         challenge: &str,
-        c: &str,
+        c: &[u8],
         s: &str,
-        rt: &str,
     ) -> Result<String> {
-        let slide_w: Function = MiniV8::new().eval(include_str!("../js/slide.js")).map_err(|_| other_without_source("js运行时创建失败"))?;
-        slide_w.call((key, gt, challenge, c, s, rt)).map_err(|_| other_without_source("js运行时出错"))
+        Ok(slide_calculate(key.parse().map_err(|e| other("滑动距离不是整数类型", e))?, gt, challenge, c, s))
     }
 }
 
 impl Test for Slide {
     fn test(&mut self, url: &str) -> Result<String> {
-        let rt = "82253e788a7b95e9";
         let (gt, mut challenge) = self.register_test(url)?;
         let (_, _) = self.get_c_s(gt.as_str(), challenge.as_str(), None)?;
         let _ = self.get_type(gt.as_str(), challenge.as_str(), None)?;
         let (c, s, args) = self.get_new_c_s_args(gt.as_str(), challenge.as_str())?;
         challenge = args.0.clone();
         let key = self.calculate_key(args)?;
-        let w = self.generate_w(
-            key.as_str(),
-            gt.as_str(),
-            challenge.as_str(),
-            serde_json::to_string(&c).unwrap().as_str(),
-            s.as_str(),
-            rt,
-        )?;
+        let w = slide_calculate(key.parse().unwrap(), &gt, &challenge, &c, &s);
         let (_, validate) =
             self.verify(gt.as_str(), challenge.as_str(), Option::from(w.as_str()))?;
         Ok(validate)

@@ -4,7 +4,7 @@ mod click;
 mod error;
 mod py;
 mod slide;
-// mod w;
+mod w;
 
 #[cfg(test)]
 mod tests {

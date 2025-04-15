@@ -49,7 +49,7 @@ class SlidePy:
         :return: key
         """
 
-    def generate_w(self, key: str, gt: str, challenge: str, c: str, s: str, rt: str,) -> str:
+    def generate_w(self, key: str, gt: str, challenge: str, c: str, s: str,) -> str:
         """
         生成w
         :param key: calculate_key生成的关键参数
@@ -57,7 +57,6 @@ class SlidePy:
         :param challenge: challenge
         :param c: c
         :param s: s
-        :param rt: rt
         :return: w
         """
 
@@ -127,7 +126,7 @@ class ClickPy:
         :return: key
         """
 
-    def generate_w(self, key: str, gt: str, challenge: str, c: str, s: str, rt: str,) -> str:
+    def generate_w(self, key: str, gt: str, challenge: str, c: str, s: str) -> str:
         """
         生成w
         :param key: calculate_key生成的关键参数
@@ -135,7 +134,6 @@ class ClickPy:
         :param challenge: challenge
         :param c: c
         :param s: s
-        :param rt: rt
         :return: w
         """
 

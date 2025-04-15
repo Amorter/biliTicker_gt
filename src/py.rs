@@ -4,7 +4,7 @@ use crate::error::Error;
 use crate::slide::Slide;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::PyModule;
-use pyo3::types::PyModuleMethods;
+use pyo3::types::{PyModuleMethods};
 use pyo3::{pyclass, pymethods, pymodule, Bound, PyErr, PyResult};
 
 #[pymodule]
@@ -79,12 +79,11 @@ impl SlidePy {
         key: &str,
         gt: &str,
         challenge: &str,
-        c: &str,
+        c: &[u8],
         s: &str,
-        rt: &str,
     ) -> PyResult<String> {
         self.inner
-            .generate_w(key, gt, challenge, c, s, rt)
+            .generate_w(key, gt, challenge, c, s)
             .map_err(PyErr::from)
     }
 
@@ -152,12 +151,11 @@ impl ClickPy {
         key: &str,
         gt: &str,
         challenge: &str,
-        c: &str,
+        c: &[u8],
         s: &str,
-        rt: &str,
     ) -> PyResult<String> {
         self.inner
-            .generate_w(key, gt, challenge, c, s, rt)
+            .generate_w(key, gt, challenge, c, s)
             .map_err(PyErr::from)
     }
 
