@@ -1,6 +1,6 @@
 [package]
 name = "bili_ticket_gt_python"
-version = "0.2.8"
+version = "0.3.0"
 edition = "2021"
 
 [lib]
