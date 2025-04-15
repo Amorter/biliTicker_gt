@@ -94,7 +94,7 @@ impl SlidePy {
 
 #[pyclass]
 struct ClickPy {
-    inner: Click<'static>,
+    inner: Click,
 }
 
 #[pymethods]

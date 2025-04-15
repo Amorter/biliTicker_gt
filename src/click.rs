@@ -2,33 +2,31 @@ use crate::abstraction::{Api, GenerateW, Test, VerifyType};
 use crate::error::{
     missing_param, net_work_error, other, other_without_source, parse_error, Result,
 };
-use ddddocr::{BBox, CharsetRange, Ddddocr};
-use image::ImageFormat;
+
 use reqwest::blocking::Client;
 use serde_json::Value;
-use std::collections::{HashMap, HashSet};
-use std::io::Cursor;
+use std::collections::{HashMap};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
+use captcha_breaker::captcha::ChineseClick0;
 use crate::w::click_calculate;
 
-pub struct Click<'a> {
+pub struct Click {
     client: Client,
     verify_type: VerifyType,
-    ocr: Ddddocr<'a>,
-    det: Ddddocr<'a>,
+    cb: ChineseClick0,
 }
-impl Default for Click<'_> {
+impl Default for Click {
     fn default() -> Self {
+        let env = captcha_breaker::environment::CaptchaEnvironment::default();
         Click {
             client: Client::new(),
             verify_type: VerifyType::Click,
-            ocr: ddddocr::ddddocr_classification().unwrap(),
-            det: ddddocr::ddddocr_detection().unwrap(),
+            cb: env.load_captcha_breaker::<ChineseClick0>().unwrap(),
         }
     }
 }
-impl Api for Click<'_> {
+impl Api for Click {
     type ArgsType = String;
 
     fn register_test(&self, url: &str) -> crate::error::Result<(String, String)> {
@@ -125,7 +123,7 @@ impl Api for Click<'_> {
         gt: &str,
         challenge: &str,
         w: Option<&str>,
-    ) -> crate::error::Result<(String, String)> {
+    ) -> Result<(String, String)> {
         let url = "http://api.geevisit.com/ajax.php";
         let mut params = HashMap::from([
             ("gt", gt),
@@ -210,7 +208,7 @@ impl Api for Click<'_> {
     }
 }
 
-impl GenerateW for Click<'_> {
+impl GenerateW for Click {
     /// ### 计算滑块的关键参数
     /// #### 返回值
     /// - positions
@@ -218,90 +216,16 @@ impl GenerateW for Click<'_> {
         let pic_url = args;
         let pic_img = self.download_img(pic_url.as_str())?;
         let pic_img = image::load_from_memory(&pic_img).map_err(|e| other("图片加载失败", e))?;
-        let bg_img = pic_img.crop_imm(0, 0, 344, 344);
-        let text_img = pic_img.crop_imm(0, 345, 116, 40);
-        let mut text = Vec::new();
 
-        //识别题目文字
-        let mut text_bytes = Cursor::new(Vec::new());
-        text_img
-            .write_to(&mut text_bytes, ImageFormat::Png)
-            .unwrap();
-        self.ocr
-            .set_ranges(CharsetRange::DefaultCharsetLowercaseUppercaseDigit);
-        let s = self
-            .ocr
-            .classification_probability(text_bytes.into_inner(), false)
-            .expect("ddddocr内部错误")
-            .get_text()
-            .to_string();
-
-        //目标检测+识别背景图中文字
-        let mut bg_bytes = Cursor::new(Vec::new());
-        bg_img.write_to(&mut bg_bytes, ImageFormat::Png).unwrap();
-        let bg_det = self
-            .det
-            .detection(bg_bytes.into_inner())
-            .expect("ddddocr内部错误");
-        for det in &bg_det {
-            let new_img = bg_img.crop_imm(det.x1, det.y1, det.x2 - det.x1, det.y2 - det.y1);
-            let mut new_bytes = Cursor::new(Vec::new());
-            new_img.write_to(&mut new_bytes, ImageFormat::Png).unwrap();
-            self.ocr.set_ranges(CharsetRange::Other(s.clone()));
-            let c = self
-                .ocr
-                .classification_probability(new_bytes.into_inner(), false)
-                .expect("ddddocr内部错误");
-            text.push(c);
-        }
-
-        //如果一张没检测到，直接Result
-        if text.is_empty() {
-            return Err(other_without_source("背景图中未识别到文字"));
-        }
-
-        //求检测出来包含在题目中的最大可能性
-        let mut max_vec = vec![(0, 0f32); s.chars().count()];
-        //检测的可能性
-        for (idx_cp, cp) in text.iter().enumerate() {
-            let mut pos = Vec::with_capacity(s.len());
-            //charset中的字符
-            for c in &cp.charset {
-                //在题目中的位置
-                let idx = s.chars().position(|x| &x.to_string() == c);
-                pos.push(idx);
-            }
-
-            for pb in &cp.probability {
-                for (i, p) in pb.iter().enumerate() {
-                    if let Some(i) = pos[i] {
-                        if max_vec[i].1 < *p {
-                            max_vec[i].1 = *p;
-                            max_vec[i].0 = idx_cp;
-                        }
-                    }
-                }
-            }
-        }
-    
-        //遍历题目
-        let mut res = Vec::with_capacity(s.chars().count());
-
-        let mut set = HashSet::new();
-        for (idx, _) in &max_vec {
-            set.insert(idx);
-            let bbox: &BBox = bg_det.get(idx.clone()).expect("未知错误");
-            let x = (bbox.x1 + bbox.x2) / 2;
-            let y = (bbox.y1 + bbox.y2) / 2;
+        let cb_res = self.cb.run(&pic_img).map_err(|e| other_without_source("cb模块内部错误"))?;
+        let mut res = vec![];
+        for (x, y) in &cb_res {
             let position = format!(
                 "{}_{}",
-                (x as f64 / 333.375 * 100f64 * 100f64).round(),
-                (y as f64 / 333.375 * 100f64 * 100f64).round()
+                (x / 333.375 * 100f32 * 100f32).round(),
+                (y / 333.375 * 100f32 * 100f32).round()
             );
             res.push(position);
-        }
-        if max_vec.len() != set.len() {
-            return Err(other_without_source("验证码自查出现错误"));
         }
 
         Ok(res.join(","))
@@ -319,7 +243,7 @@ impl GenerateW for Click<'_> {
     }
 }
 
-impl Test for Click<'_> {
+impl Test for Click {
     fn test(&mut self, url: &str) -> Result<String> {
         let (gt, challenge) = self.register_test(url)?;
         let (_, _) = self.get_c_s(gt.as_str(), challenge.as_str(), None)?;
@@ -341,7 +265,7 @@ impl Test for Click<'_> {
     }
 }
 
-impl Click<'_> {
+impl Click {
     pub fn simple_match(&mut self, gt: &str, challenge: &str) -> Result<String> {
         let (_, _) = self.get_c_s(gt, challenge, None)?;
         let _ = self.get_type(gt, challenge, None)?;
