@@ -2,23 +2,26 @@ use crate::abstraction::{Api, GenerateW, Test, VerifyType};
 use crate::error::{
     missing_param, net_work_error, other, other_without_source, parse_error, Result,
 };
-use image::{GenericImage, ImageFormat};
+use image::{DynamicImage, GenericImage};
 use reqwest::blocking::Client;
 use serde_json::Value;
 use std::collections::HashMap;
-use std::io::Cursor;
+use captcha_breaker::captcha::Slide0;
 use crate::w::slide_calculate;
 
 pub struct Slide {
     client: Client,
     verify_type: VerifyType,
+    cb: Slide0,
 }
 
 impl Default for Slide {
     fn default() -> Self {
+        let env = captcha_breaker::environment::CaptchaEnvironment::default();
         Slide {
             client: Client::new(),
             verify_type: VerifyType::Slide,
+            cb: env.load_captcha_breaker::<Slide0>().unwrap(),
         }
     }
 }
@@ -162,6 +165,7 @@ impl GenerateW for Slide {
         let (_, _, bg, slice) = args;
         let bg_img = self.download_img(bg.as_str())?;
         let slice_img = self.download_img(slice.as_str())?;
+        let slice_img = image::load_from_memory(&slice_img).map_err(|e| other("内部错误", e))?;
         //还原背景图
         let bg_img = image::load_from_memory(&bg_img).map_err(|e| other("图片解析错误", e))?;
         let mut new_bg_img = image::ImageBuffer::new(260, 160);
@@ -180,10 +184,9 @@ impl GenerateW for Slide {
             let pi = bg_img.crop_imm(x, y, w_sep, h_sep);
             new_bg_img.copy_from(&pi, new_x as u32, new_y).unwrap();
         }
-        let mut bytes = Cursor::new(Vec::new());
-        new_bg_img.write_to(&mut bytes, ImageFormat::Png).unwrap();
-        let res_x = ddddocr::slide_match(slice_img, bytes.into_inner())
-            .map_err(|e| other("ddddocr出错", e))?
+        let new_bg_img = DynamicImage::ImageRgba8(new_bg_img);
+        let res_x = Slide0::run(slice_img, new_bg_img)
+            .map_err(|e| other("滑块识别内部错误", e))?
             .x1;
         Ok(res_x.to_string())
     }
