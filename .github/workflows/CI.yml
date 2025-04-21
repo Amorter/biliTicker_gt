@@ -34,8 +34,6 @@ jobs:
           architecture: ${{ matrix.platform.target }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
-        env:
-            RUSTFLAGS: "-Ctarget-feature=+crt-static"
         with:
           args: --release --out dist --find-interpreter
           sccache: 'true'
