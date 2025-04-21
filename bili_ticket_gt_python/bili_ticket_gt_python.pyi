@@ -16,7 +16,7 @@ class SlidePy:
         :return: gt, challenge
         """
 
-    def get_c_s(self, gt: str, challenge: str, w: str = None) -> Tuple[list, str]:
+    def get_c_s(self, gt: str, challenge: str, w: str = None) -> Tuple[bytes, str]:
         """
         获取c_s
         :param gt: gt
@@ -34,7 +34,7 @@ class SlidePy:
         :return: type(slide或click)
         """
 
-    def get_new_c_s_args(self, gt: str, challenge: str) -> Tuple[list, str, Tuple[str, str, str, str]]:
+    def get_new_c_s_args(self, gt: str, challenge: str) -> Tuple[bytes, str, Tuple[str, str, str, str]]:
         """
         获取新的c_s参数和验证所需参数
         :param gt: gt
@@ -49,7 +49,7 @@ class SlidePy:
         :return: key
         """
 
-    def generate_w(self, key: str, gt: str, challenge: str, c: str, s: str,) -> str:
+    def generate_w(self, key: str, gt: str, challenge: str, c: bytes, s: str,) -> str:
         """
         生成w
         :param key: calculate_key生成的关键参数
@@ -93,7 +93,7 @@ class ClickPy:
         :return: gt, challenge
         """
 
-    def get_c_s(self, gt: str, challenge: str, w: str = None) -> Tuple[list, str]:
+    def get_c_s(self, gt: str, challenge: str, w: str = None) -> Tuple[bytes, str]:
         """
         获取c_s
         :param gt: gt
@@ -111,7 +111,7 @@ class ClickPy:
         :return: type(slide或click)
         """
 
-    def get_new_c_s_args(self, gt: str, challenge: str) -> Tuple[list, str, str]:
+    def get_new_c_s_args(self, gt: str, challenge: str) -> Tuple[bytes, str, str]:
         """
         获取新的c_s参数和验证所需参数
         :param gt: gt
@@ -126,7 +126,7 @@ class ClickPy:
         :return: key
         """
 
-    def generate_w(self, key: str, gt: str, challenge: str, c: str, s: str) -> str:
+    def generate_w(self, key: str, gt: str, challenge: str, c: bytes, s: str) -> str:
         """
         生成w
         :param key: calculate_key生成的关键参数

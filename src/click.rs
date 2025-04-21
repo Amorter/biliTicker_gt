@@ -55,7 +55,7 @@ impl Api for Click {
         &self,
         gt: &str,
         challenge: &str,
-    ) -> crate::error::Result<(Vec<u8>, String, Self::ArgsType)> {
+    ) -> Result<(Vec<u8>, String, Self::ArgsType)> {
         let url = "http://api.geevisit.com/get.php";
         let mut params = HashMap::from([
             ("gt", gt),

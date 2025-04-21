@@ -1,58 +1,12 @@
 ## 极验验证模块的python语言绑定
 
-### 赞助
-[爱发电(秦诗染)](https://afdian.net/a/amort)
+- 以前的[赞助名单](docs/ZANZHU.md)
 
-### 赞助名单(排名不分先后)
-##### 感谢大家的支持，大家的支持是项目前进的动力！
+### 特别鸣谢
+- [Hobr](https://github.com/Hobr) 提供大量技术支持
+- [woshiluo](https://github.com/woshiluo) 提供大量技术支持和指导，修复很多本项目的bug
+- [mikumifa](https://github.com/mikumifa/biliTickerBuy) 提供部分实现思路
 
-- 228****503  麟昀
-- 497****27  [techzjc](https://github.com/g497813927)
-- 240****48   吖
-- 117****307  asdfff
-- 6****710    [铛铛.](https://github.com/dangdangpi)
-- 254****276   Yinser
-- 27****2875   (˵¯͒〰¯͒˵)
-- 206****574   [苦楚なのだ](https://github.com/wxt2333)
-- 377****313   [幻梦](https://github.com/huanmeng-qwq)
-- 321****97    存在的语
-- 304****419   ......✔
-- 852****25    梓逸
-- 177****559   [酒宝Official](https://github.com/jiajiu123)
-- 74****517    Hikari
-- 21****3297  糕手花见sama
-- 80****265   [渡月桥ovo](https://github.com/duyueovo)
-- 224****530  [江川三三](https://github.com/jcss0610)
-- 252****652  月がきれい
-- 307****743  。
-- 506****61   andy
-- 282****542  しろ
-- 193****886  枕月如风
-- 2571****11  诗涤
-- 987****49   zhishi
-- 170****995  [听雨](https://github.com/tingyu75?tab=repositories)
-- 231****383  那白真云
-- 196****406  [沐浴晨煦](https://github.com/ChenXu233)
-- 2968****09  Star
-- 20****6519  铥*
-- 233****227  [故园](https://github.com/NTFago)
-- 543****69   我
-- 92****033   古明地觉
-- 137****726  [Kizuna_AI](https://github.com/Kizuna-AI0630)
-- 100****684  五条新菜
-- 112****460  [亚里士多缺德](https://github.com/Teeedy)
-- 99****135   [Anli](https://github.com/AkiCCLing)
-- 223****994  比企谷雪乃
-- 343****231  天凡
-- 112****551  Jason_杰森森
-- 119****179  左 佑
-- 136****474  ？狼
-- 107****818  分贝咩
-- 247****056  南楚冥灵
-- 144****247  yuanzi.
-- 181****302  吾妻槿夜
-- 269****949
-- 25****883
 
 ### 使用方式
 
@@ -137,7 +91,7 @@ try:
     key = slide.calculate_key(args)
     #rt固定即可
     #此处使用内嵌js二进制运行时生成w, 你也可以自己接入生成w的逻辑函数
-    w = slide.generate_w(key, gt, challenge, str(c), s, "abcdefghijklmnop")
+    w = slide.generate_w(key, gt, challenge, c, s)
     (msg, validate) = slide.verify(gt, challenge, w)
     print(validate)
 except Exception as e:
@@ -161,7 +115,7 @@ try:
     key = click.calculate_key(args)
     #rt固定即可
     #此处使用内嵌js二进制运行时生成w, 你也可以自己接入生成w的逻辑函数
-    w = click.generate_w(key, gt, challenge, str(c), s, "abcdefghijklmnop")
+    w = click.generate_w(key, gt, challenge, c, s)
     #点选验证码生成w后需要等待2秒提交
     w_use_time = time.time() - before_calculate_key
     print("w生成时间：", w_use_time)
