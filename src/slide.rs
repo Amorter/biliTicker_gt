@@ -186,7 +186,7 @@ impl GenerateW for Slide {
         }
         let new_bg_img = DynamicImage::ImageRgba8(new_bg_img);
         let res_x = Slide0::run(slice_img, new_bg_img)
-            .map_err(|e| other("滑块识别内部错误", e))?
+            .map_err(|e| other_without_source("滑块识别内部错误"))?
             .x1;
         Ok(res_x.to_string())
     }
