@@ -12,16 +12,13 @@ use crate::w::slide_calculate;
 pub struct Slide {
     client: Client,
     verify_type: VerifyType,
-    cb: Slide0,
 }
 
 impl Default for Slide {
     fn default() -> Self {
-        let env = captcha_breaker::environment::CaptchaEnvironment::default();
         Slide {
             client: Client::new(),
             verify_type: VerifyType::Slide,
-            cb: env.load_captcha_breaker::<Slide0>().unwrap(),
         }
     }
 }
