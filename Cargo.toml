@@ -21,3 +21,6 @@ rand = "0.8.5"
 hex="0.4"
 soft-aes="0.2"
 md5 = "0.7"
+
+[patch.crates-io]
+ort = { git="https://github.com/biliticket/ort" }
