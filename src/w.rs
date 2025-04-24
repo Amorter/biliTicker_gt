@@ -34,7 +34,7 @@ fn get_int_by_mask(base: i32, mask: i32) -> i32 {
     res
 }
 
-pub fn base64(input: &[u8]) -> String {
+fn base64(input: &[u8]) -> String {
     let input = input.iter().map(|x| *x as i32).collect::<Vec<i32>>();
     let mut result: String = String::new();
     let mut padding = "";
@@ -429,7 +429,7 @@ fn user_response(key: i32, challenge: &str) -> String {
 }
 
 
-pub fn slide_calculate(key: i32, gt: &str, challenge: &str, c: &[u8], s: &str) -> String {
+pub(crate) fn slide_calculate(key: i32, gt: &str, challenge: &str, c: &[u8], s: &str) -> String {
     let track = get_slide_track(key);
     let pass_time = track.last().unwrap()[2];
     let aa = {

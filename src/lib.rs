@@ -2,7 +2,6 @@
 mod abstraction;
 mod click;
 mod error;
-mod py;
 mod slide;
 mod w;
 

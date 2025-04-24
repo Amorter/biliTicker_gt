@@ -10,7 +10,7 @@ pub(crate) enum VerifyType {
     Click,
 }
 
-pub(crate) trait Api {
+pub trait Api {
     type ArgsType;
     /// ### 申请验证码
     /// #### 返回值
@@ -143,7 +143,7 @@ pub(crate) trait Api {
     fn client(&self) -> &Client;
 }
 
-pub(crate) trait GenerateW: Api {
+pub trait GenerateW: Api {
     /// ### 计算关键参数
     /// - 不同验证类型的关键参数不同
     fn calculate_key(&mut self, args: Self::ArgsType) -> Result<String>;
