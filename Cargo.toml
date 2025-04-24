@@ -1,11 +1,7 @@
 [package]
-name = "bili_ticket_gt_python"
+name = "bili_ticket_gt"
 version = "0.3.1"
 edition = "2024"
-
-[lib]
-name = "bili_ticket_gt_python"
-crate-type = ["cdylib"]
 
 [dependencies]
 reqwest = {version = "0.12", features = ["blocking", "json"]}
@@ -13,7 +9,6 @@ serde = "1.0"
 serde_json = "1.0"
 image = "0.25"
 captcha_breaker = "0.0.0-dev.7"
-
 
 rsa = "0.9"
 rand = "0.8.5"

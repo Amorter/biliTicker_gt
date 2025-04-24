@@ -1,8 +1,8 @@
 #![recursion_limit = "256"]
 mod abstraction;
-mod click;
+pub mod click;
 mod error;
-mod slide;
+pub mod slide;
 mod w;
 
 #[cfg(test)]
