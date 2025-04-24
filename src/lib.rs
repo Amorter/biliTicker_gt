@@ -1,7 +1,7 @@
 #![recursion_limit = "256"]
-mod abstraction;
+pub mod abstraction;
 pub mod click;
-mod error;
+pub mod error;
 pub mod slide;
 mod w;
 
