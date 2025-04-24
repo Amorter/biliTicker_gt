@@ -1,4 +1,5 @@
 *.pyd
+bili_ticket_gt_python/*.so
 target/
 Cargo.lock
 models/
