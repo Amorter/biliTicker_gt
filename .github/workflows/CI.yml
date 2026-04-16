@@ -100,7 +100,7 @@ jobs:
     strategy:
       matrix:
         platform:
-          - runner: macos-13
+          - runner: macos-15-intel
             target: x64
     steps:
       - uses: actions/checkout@v4
