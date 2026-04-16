@@ -36,6 +36,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         env:
             RUSTFLAGS: "-Ctarget-feature=+crt-static"
+            PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
         with:
           args: --release --out dist --find-interpreter
           sccache: 'true'
@@ -64,6 +65,8 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
+        env:
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -89,6 +92,8 @@ jobs:
           target: aarch64
           args: --release --out dist --find-interpreter
           sccache: 'true'
+        env:
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -114,6 +119,8 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
+        env:
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
